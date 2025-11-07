@@ -1,11 +1,13 @@
 {
-  "name": "what-revenge",
+  "name": "@consoleillusion/what-revenge",
+  "version": "0.0.1",
   "module": "index.ts",
   "type": "module",
   "scripts": {
     "clean": "rm -rf ./dist",
     "generateVars": "bun ./src/updateWhatCategories.js",
-    "build": "bun run clean && mkdir -p ./dist && bun run generateVars && node_modules/.bin/sass src/index.scss ./dist/index.css"
+    "minify": "lightningcss --minify --bundle --targets \">= 0.25%\" ./dist/index.css -o ./dist/index.min.css 2> /dev/null || nix run nixpkgs#lightningcss -- --minify --bundle --targets \">= 0.25%\" ./dist/index.css -o ./dist/index.min.css",
+    "build": "bun run clean && mkdir -p ./dist && bun run generateVars && node_modules/.bin/sass src/index.scss ./dist/index.css; bun run minify"
   },
   "devDependencies": {
     "@types/bun": "latest"
@@ -15,6 +17,7 @@
   },
   "dependencies": {
     "cheerio": "^1.1.2",
+    "lightningcss-cli": "^1.30.2",
     "node-html-parser": "^7.0.1",
     "ramda": "^0.32.0",
     "sass": "^1.93.3"

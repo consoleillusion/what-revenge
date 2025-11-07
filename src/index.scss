@@ -1,5 +1,5 @@
 @use 'mixins' as *;
-@use "./generated_html_category_variables";
+@use "./generated_html_category_variables" as *;
 
 $link-body-ok: 'link:is([itemprop], [rel="dns-prefetch"], [rel="modulepreload"], [rel="pingback"], [rel="preconnect"], [rel="prefetch"], [rel="preload"], [rel="stylesheet"])';
 $input: 'input:not([type="hidden"])', 'input[type="hidden"]';
@@ -8,26 +8,12 @@ $heirarchically-correct-main-parents: html, body, div, form;
 $global-attributes: accesskey, autocapitalize, autocorrect, autofocus, contenteditable, dir, draggable, enterkeyhint, hidden, inert, inputmode, is, itemid, itemprop, itemref, itemscope, itemtype, lang, nonce, popover, spellcheck, style, tabindex, title, translate, writingsuggestions;
 
 $all: "*", "::after", "::before", "::backdrop", "::file-selector-button";
-$script-supporting: script, template;
-$sectioning: article, aside, nav, section;
-$submittable: button, $input, select, textarea;
-$resettable: $input, output, select, textarea;
-$heading: h1, h2, h3, h4, h5, h6, hgroup;
-$interactive: button, details, embed, iframe, label, select, textarea, 'a[href]', '[controls]:is(video,audio)', 'img[usemap]', 'input:not([type="hidden"])';
-$autocapitalize-and-autocorrect-inheriting: unique($submittable, $resettable, fieldset);
-$listed: unique($submittable, $resettable, $autocapitalize-and-autocorrect-inheriting, object);
-$labelable: unique($submittable, $resettable, meter, progress);
-$metadata: unique($script-supporting, base, link, meta, noscript, style, title);
-$form-associated: unique($listed, $submittable, $resettable, $autocapitalize-and-autocorrect-inheriting, label, img);
-$embedded: unique(audio, canvas, embed, iframe, img, math, object, picture, svg, video);
-$phrasing: unique($embedded, $submittable, $resettable, $labelable, $script-supporting, a, abbr, b, bdi, bdo, br, cite, code, data, datalist, del, dfn, em, i, ins, kbd, label, map, mark, noscript, q, ruby, s, samp, slot, small, span, strong, sub, sup, time, u, var, wbr, map area, meta[itemprop], $link-body-ok);
-$palpable: unique($sectioning, $heading, $interactive, a, abbr, address, b, bdi, bdo, blockquote, canvas, cite, code, data, del, dfn, div, em, fieldset, figure, footer, form, header, i, img, ins, kbd, main, map, mark, math, meter, object, output, p, picture, pre, progress, q, ruby, s, samp, search, small, span, strong, sub, sup, svg, table, time, u, var, video, ':is(menu,ol,ul):has(li)');
-$flow: unique($sectioning, $heading, $phrasing, $embedded, $interactive, $form-associated, $listed, $submittable, $resettable, $autocapitalize-and-autocorrect-inheriting, $labelable, $script-supporting, address, blockquote, dialog, div, dl, figure, footer, form, header, hr, menu, ol, p, pre, search, table, ul, ':is(#{$heirarchically-correct-main-parents}) main');
 
 $warnings:
   ( 'a:not([href]),a[href=""]'              : '<a> tags have defined, non-empty hrefs.'
   , ':is(#{$phrasing}) :not(#{$phrasing})': 'Phrasing elements can only include other phrasing elements.'
   , ':is(#{$interactive}) :is(#{$interactive})': 'Interactive elements should not contain other interactive elements'
+  , ':is(#{$obsolete})'                     : 'Obsolete Element'
 
   , 'input:not([type])'                     : '<input> should define a "type"'
   , 'input:not([name])'                     : '<input> should define a "name", as this is the label given for form data'
@@ -40,8 +26,8 @@ $warnings:
   , 'html:not([lang])'                      : '<html> should define a "lang"'
   , 'iframe:not([title])'                   : '<iframe> should define a "title"'
 
-  , 'img:not([alt])'                          : '<img> should define an alt'
-  , 'button :is(#{$interactive})'          : '<button> should not include interactive elements'
+  , 'img:not([alt])'                        : '<img> should define an alt'
+  , 'button :is(#{$interactive})'           : '<button> should not include interactive elements'
   , 'a:empty:not([aria-label]):not([aria-labelledby]), a:not([aria-label]):not([aria-labelledby]) img:only-child:not([alt])' : 'All links should have text content, an image with alt text or an ARIA label.'
   , 'button:empty:not([aria-label]):not([aria-labelledby]), button:not([aria-label]):not([aria-labelledby]) img:only-child:not([alt])' : 'All buttons should have text content, an image with alt text or an ARIA label.'
 
@@ -68,10 +54,14 @@ $warnings:
   , 'main:is(:not(#{$heirarchically-correct-main-parents}) main)': 'If defined, <main> should be heirarchically correct.'
   );
 
+:root {
+  --color-revenge: #dc143c;
+}
 @each $selector, $message in $warnings {
   :is(#{$selector})::after {
-    outline: .3rem solid var(#dc143c);
-    box-shadow: 0 0 1rem .1rem var(--color-revenge,#dc143c);
+    //outline: .3rem solid var(#dc143c);
+    //box-shadow: 0 0 1rem .1rem var(--color-revenge,#dc143c);
+    outline: .3rem solid var(--color-revenge);
     content: $message;
     display: block;
   }
