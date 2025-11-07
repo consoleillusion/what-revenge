@@ -1,6 +1,10 @@
 import {__,concat,replace,tap,reduce,map,pipe,includes,all,difference,filter,pluck,unnest,assoc,converge,sortBy,identity} from "ramda"
 import {getWhatCategories} from "./getWhatCategories.js"
 
+/**
+ * Check if category A (parent) fully includes category B (child)
+ * i.e. all elements of B exist in A.
+ */
 let categoryIncludes =
   c1 => c2 => c1.category !== c2.category
          && all( includes( __
@@ -9,15 +13,10 @@ let categoryIncludes =
                , c2.elements
                )
 
-let removeChildElements =
-  cs => cat1 =>
-    difference( cat1.elements
-                , pipe
-                  ( filter(cat2 => includes(cat2.category, cat1.children))
-                  , pluck('elements')
-                  , unnest
-                  )(cs)
-                 )
+/**
+ * Given all categories, add a `children` property to each one
+ * listing the names of the categories it includes.
+ */
 const setChildren =
   cs => cat1 =>
     assoc( 'children'
@@ -26,6 +25,22 @@ const setChildren =
                ) (cs)
          , cat1
          )
+
+/**
+ * Given all categories, remove from each category any elements
+ * that already belong to one of its child categories.
+ */
+const x = categories => cat1 => pipe
+  ( filter(cat2 => includes(cat2.category, cat1.children))
+  , pluck('elements')
+  , unnest
+  ) (categories)
+
+const removeChildElements =
+  categories => category =>
+    difference( category.elements
+              , x(categories)(category)
+              )
 
 const scssFileHead =
 `/* 
@@ -37,17 +52,16 @@ export const generateSCSSVars =
   categories => pipe
     ( converge( map, [setChildren, identity] )
     , sortBy( x => x.elements.length)
-    , cs => map( converge
+    , categories => map( converge
                  ( assoc('elements')
-                 , [removeChildElements(cs), identity]
+                 , [removeChildElements(categories), identity]
                  )
-               , cs
+               , categories
                )
      , map( c => ({...c,scss: [ ...c.children.map(x=>'$'+x)
                               , ...c.elements
                               ].join(', ')
                   }))
-  
     , reduce( (acc,cur) => `${acc}$${cur.category}: ${cur.scss};`
             , ""
             )
