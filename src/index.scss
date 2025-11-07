@@ -1,0 +1,78 @@
+@use 'mixins' as *;
+@use "./generated_html_category_variables";
+
+$link-body-ok: 'link:is([itemprop], [rel="dns-prefetch"], [rel="modulepreload"], [rel="pingback"], [rel="preconnect"], [rel="prefetch"], [rel="preload"], [rel="stylesheet"])';
+$input: 'input:not([type="hidden"])', 'input[type="hidden"]';
+$heirarchically-correct-main-parents: html, body, div, form;
+
+$global-attributes: accesskey, autocapitalize, autocorrect, autofocus, contenteditable, dir, draggable, enterkeyhint, hidden, inert, inputmode, is, itemid, itemprop, itemref, itemscope, itemtype, lang, nonce, popover, spellcheck, style, tabindex, title, translate, writingsuggestions;
+
+$all: "*", "::after", "::before", "::backdrop", "::file-selector-button";
+$script-supporting: script, template;
+$sectioning: article, aside, nav, section;
+$submittable: button, $input, select, textarea;
+$resettable: $input, output, select, textarea;
+$heading: h1, h2, h3, h4, h5, h6, hgroup;
+$interactive: button, details, embed, iframe, label, select, textarea, 'a[href]', '[controls]:is(video,audio)', 'img[usemap]', 'input:not([type="hidden"])';
+$autocapitalize-and-autocorrect-inheriting: unique($submittable, $resettable, fieldset);
+$listed: unique($submittable, $resettable, $autocapitalize-and-autocorrect-inheriting, object);
+$labelable: unique($submittable, $resettable, meter, progress);
+$metadata: unique($script-supporting, base, link, meta, noscript, style, title);
+$form-associated: unique($listed, $submittable, $resettable, $autocapitalize-and-autocorrect-inheriting, label, img);
+$embedded: unique(audio, canvas, embed, iframe, img, math, object, picture, svg, video);
+$phrasing: unique($embedded, $submittable, $resettable, $labelable, $script-supporting, a, abbr, b, bdi, bdo, br, cite, code, data, datalist, del, dfn, em, i, ins, kbd, label, map, mark, noscript, q, ruby, s, samp, slot, small, span, strong, sub, sup, time, u, var, wbr, map area, meta[itemprop], $link-body-ok);
+$palpable: unique($sectioning, $heading, $interactive, a, abbr, address, b, bdi, bdo, blockquote, canvas, cite, code, data, del, dfn, div, em, fieldset, figure, footer, form, header, i, img, ins, kbd, main, map, mark, math, meter, object, output, p, picture, pre, progress, q, ruby, s, samp, search, small, span, strong, sub, sup, svg, table, time, u, var, video, ':is(menu,ol,ul):has(li)');
+$flow: unique($sectioning, $heading, $phrasing, $embedded, $interactive, $form-associated, $listed, $submittable, $resettable, $autocapitalize-and-autocorrect-inheriting, $labelable, $script-supporting, address, blockquote, dialog, div, dl, figure, footer, form, header, hr, menu, ol, p, pre, search, table, ul, ':is(#{$heirarchically-correct-main-parents}) main');
+
+$warnings:
+  ( 'a:not([href]),a[href=""]'              : '<a> tags have defined, non-empty hrefs.'
+  , ':is(#{$phrasing}) :not(#{$phrasing})': 'Phrasing elements can only include other phrasing elements.'
+  , ':is(#{$interactive}) :is(#{$interactive})': 'Interactive elements should not contain other interactive elements'
+
+  , 'input:not([type])'                     : '<input> should define a "type"'
+  , 'input:not([name])'                     : '<input> should define a "name", as this is the label given for form data'
+  , 'input[pattern]:not([title])'           : 'If you define a pattern on an <input>, "title" is also a helpful attribute'
+  , 'input[placeholder]'                    : '<input> attribute placeholder is generally not recommended, especially as a replacement for a label.'
+  , 'input'                                 : 'Labels should generally be followed by inputs'
+  , 'label:not([for])'                      : 'A <label> should define a "for" attribute matching an <input> "id"'
+  , 'label + input'                         : ''
+
+  , 'html:not([lang])'                      : '<html> should define a "lang"'
+  , 'iframe:not([title])'                   : '<iframe> should define a "title"'
+
+  , 'img:not([alt])'                          : '<img> should define an alt'
+  , 'button :is(#{$interactive})'          : '<button> should not include interactive elements'
+  , 'a:empty:not([aria-label]):not([aria-labelledby]), a:not([aria-label]):not([aria-labelledby]) img:only-child:not([alt])' : 'All links should have text content, an image with alt text or an ARIA label.'
+  , 'button:empty:not([aria-label]):not([aria-labelledby]), button:not([aria-label]):not([aria-labelledby]) img:only-child:not([alt])' : 'All buttons should have text content, an image with alt text or an ARIA label.'
+
+  , 'figcaption'                            : '<figcaption>s must belong to parent <figure>s.'
+  , 'figure figcaption'                     : ''
+
+  , '[align], [alink], [background], [bgcolor], [border], [clear], [height], [hspace], [link], [nowrap], [start], [vlink], [vspace]':  'You are using a deprecated attribute. Use CSS instead.'
+  , 'script[language]': 'The language attribute is superceded by type. Use type.' 
+  , 'table[summary]': 'The summary attribute is deprecated. Perhaps use the <caption> element.'
+
+  , '[tabindex]:not([tabindex="0"]):not([tabindex="-1"])' : 'Do not disrupt the natural tab order.' 
+
+  , ':is(#{$sectioning}) [role="banner"]': '[role="banner"] is used for a sitewide heading, it should not be in a subsection. It is also equal in meaning to a top level <heading> element.'
+  , ':is(#{$sectioning}) [role="contentinfo"]': '[role="contentinfo"] is used for a sitewide footer, it should not be in a subsection. It is also equal in meaning to a top level <footer> element.'
+
+  , 'a :not(#{difference($phrasing,$interactive)})': '<a> can only have non-interactive phrasing descendents'
+
+  , 'li': 'li elements should not be outside ul or ol'
+  , ':is(ul,ol) li': ''
+
+  , 'form:not([action])': 'In HTML4, Forms must have action attributes. In HTML5, they are not required, but must be valid urls if defined.'
+  , 'fieldset > *:first-child:not(legend)': 'Place a legend as the first element in this fieldset.'
+  , 'form:not([action=""])': "If they're specified, forms \"action\" and \"formaction\" should be valid url."
+  , 'main:is(:not(#{$heirarchically-correct-main-parents}) main)': 'If defined, <main> should be heirarchically correct.'
+  );
+
+@each $selector, $message in $warnings {
+  :is(#{$selector})::after {
+    outline: .3rem solid var(#dc143c);
+    box-shadow: 0 0 1rem .1rem var(--color-revenge,#dc143c);
+    content: $message;
+    display: block;
+  }
+}

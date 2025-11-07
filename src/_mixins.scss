@@ -1,0 +1,87 @@
+@use 'sass:list';
+@use "sass:meta";
+
+@mixin apply-to($lists...) {
+  $all-selectors: ();
+
+  // Flatten all lists and remove duplicates
+  @each $list in $lists {
+    @each $item in $list {
+      @if list.index($all-selectors, $item) == null {
+        $all-selectors: list.append($all-selectors, $item, comma);
+      }
+    }
+  }
+
+  // Build selector string
+  $selector-str: "";
+
+  @each $s in $all-selectors {
+    $selector-str: if($selector-str == "", "#{$s}", "#{$selector-str}, #{$s}");
+  }
+
+  // Apply styles
+  #{$selector-str} {
+    @content;
+  }
+}
+
+@mixin prefix($property, $value) {
+  -webkit-#{$property}: #{$value};
+     -moz-#{$property}: #{$value};
+          #{$property}: #{$value};
+}
+
+@function flatten($list) {
+  $result: ();
+  @each $item in $list {
+    @if meta.type-of($item) == 'list' {
+      $result: list.join($result, flatten($item), comma);
+    } @else {
+      $result: list.append($result, $item, comma);
+    }
+  }
+  @return $result;
+}
+
+@function unique($args...) {
+  $flat: flatten($args);
+  $result: ();
+
+  @each $item in $flat {
+    @if not list.index($result, $item) {
+      $result: list.append($result, $item, comma);
+    }
+  }
+
+  @return $result;
+}
+
+@function difference($a, $b) {
+  $result: ();
+  @each $item in $a {
+    @if not list.index($b, $item) {
+      $result: list.append($result, $item, list.separator($a));
+    }
+  }
+  @return $result;
+}
+@function union($a, $b) {
+  $result: ();
+
+  // Add all items from A
+  @each $item in $a {
+    @if not list.index($result, $item) {
+      $result: list.append($result, $item, list.separator($a));
+    }
+  }
+
+  // Add items from B that aren't already in the result
+  @each $item in $b {
+    @if not list.index($result, $item) {
+      $result: list.append($result, $item, list.separator($a));
+    }
+  }
+
+  @return $result;
+}
