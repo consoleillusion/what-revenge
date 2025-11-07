@@ -7,7 +7,7 @@
     "clean": "rm -rf ./dist",
     "generateVars": "bun ./src/updateWhatCategories.js",
     "minify": "lightningcss --minify --bundle --targets \">= 0.25%\" ./dist/index.css -o ./dist/index.min.css 2> /dev/null || nix run nixpkgs#lightningcss -- --minify --bundle --targets \">= 0.25%\" ./dist/index.css -o ./dist/index.min.css",
-    "build": "bun run clean && mkdir -p ./dist && bun run generateVars && node_modules/.bin/sass src/index.scss ./dist/index.css; bun run minify"
+    "build": "bun run clean && mkdir -p ./dist && bun run generateVars && node_modules/.bin/sass src/index.scss ./dist/index.css; bun run minify; mv ./src/_generated_html_category_variables.scss dist"
   },
   "devDependencies": {
     "@types/bun": "latest"
