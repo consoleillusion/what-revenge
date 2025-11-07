@@ -5,13 +5,23 @@ import {getWhatCategories} from "./getWhatCategories.js"
  * Check if category A (parent) fully includes category B (child)
  * i.e. all elements of B exist in A.
  */
-let categoryIncludes =
-  c1 => c2 => c1.category !== c2.category
+let categoryIncludes = c1 => c2 => 
+  c1.category !== c2.category
          && all( includes( __
                          , c1.elements
                          )
                , c2.elements
                )
+
+/*
+  c1 => c2 => 
+  c1.category !== c2.category
+         && all( includes( __
+                         , c1.elements
+                         )
+               , c2.elements
+               )
+               */
 
 /**
  * Given all categories, add a `children` property to each one
