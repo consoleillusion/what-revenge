@@ -2,7 +2,7 @@ import {__,concat,replace,tap,reduce,map,pipe,includes,all,difference,filter,plu
 import {getWhatCategories} from "./getWhatCategories.js"
 
 let categoryIncludes =
-  (c1)=>(c2) => c1.category !== c2.category
+  c1 => c2  => c1.category !== c2.category
          && all( includes( __
                          , c1.elements
                          )
