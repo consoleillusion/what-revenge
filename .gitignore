@@ -4,7 +4,7 @@ result
 
 # output
 out
-dist
+#dist
 *.tgz
 
 # code coverage
