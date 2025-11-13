@@ -3,4 +3,4 @@ import {generateSCSSVars} from './generateSCSSVars.js'
 import {writeFileSync} from 'node:fs';
 
 const vars = generateSCSSVars(await getWhatCategories())
-writeFileSync(__dirname+'/_generated_html_category_variables.scss',vars)
+writeFileSync(__dirname+'/_html_element_categories.scss',vars)

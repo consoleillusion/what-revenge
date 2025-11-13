@@ -61,6 +61,7 @@ const scssFileHead =
 export const generateSCSSVars =
   categories => pipe
     ( converge( map, [setChildren, identity] )
+    , tap(console.log)
     , sortBy( x => x.elements.length)
     , categories => map( converge
                  ( assoc('elements')

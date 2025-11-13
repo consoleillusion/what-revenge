@@ -1,5 +1,6 @@
 import * as cheerio from 'cheerio'
-import {append,tap,map,pipe,andThen} from 'ramda'
+import {concat,append,tap,map,pipe,andThen} from 'ramda'
+import {customCategories} from './customCategories.js'
 
 const deprecatedElementsURL = 'https://html.spec.whatwg.org/multipage/obsolete.html'
 const elementCategoriesURL = "https://html.spec.whatwg.org/multipage/indices.html"
@@ -38,6 +39,7 @@ export const getWhatCategories =
           ( extractRows
           , map(rowsToData(doc))
           , append({category: "obsolete",elements: await getWhatObsolete()})
+          , concat(customCategories)
           )(doc))
     )(_)
 

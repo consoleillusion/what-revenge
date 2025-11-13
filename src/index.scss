@@ -1,5 +1,5 @@
 @use 'mixins' as *;
-@use "./generated_html_category_variables" as *;
+@use "./html_element_categories" as *;
 
 $link-body-ok: 'link:is([itemprop], [rel="dns-prefetch"], [rel="modulepreload"], [rel="pingback"], [rel="preconnect"], [rel="prefetch"], [rel="preload"], [rel="stylesheet"])';
 $input: 'input:not([type="hidden"])', 'input[type="hidden"]';
